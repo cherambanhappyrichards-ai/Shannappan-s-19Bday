@@ -1,17 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
-</head>
-<body>
-    <script>
-        if (location.hash) {
-            document.write(decodeURIComponent(location.hash.slice(1)));
-        } else {
-            document.body.innerHTML = "<h2 style='color:#fff;font-family:sans-serif;text-align:center;margin-top:20vh'>Scan the QR code to play the game! 🎄✨</h2>";
-        }
-    </script>
-</body>
-</html>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>
+body{background:#050b14;color:#fff;text-align:center;font-family:sans-serif;margin:0;overflow:hidden;touch-action:none}
+canvas{background:#0b1329;border-radius:10px;border:2px solid #1e293b;max-width:100%;height:auto}
+.btn{background:#1e293b;color:#fff;border:1px solid #38bdf8;padding:8px 12px;margin:2px;border-radius:6px;font-size:16px;user-select:none;cursor:pointer}
+</style></head><body>
+<h3 style="color:#f43f5e;margin:4px">🎄 Shannappan's 19th Christmas Quest 🎁</h3>
+<canvas id="cv" width="420" height="260"></canvas>
+<div id="m" style="margin:4px;font-size:0.9rem;color:#38bdf8">Demons to defeat: 19</div>
+<div style="margin-top:2px">
+<button class="btn" ontouchstart="k.w=1" ontouchend="k.w=0" onmousedown="k.w=1" onmouseup="k.w=0">⬆️</button><br>
+<button class="btn" ontouchstart="k.a=1" ontouchend="k.a=0" onmousedown="k.a=1" onmouseup="k.a=0">⬅️</button>
+<button class="btn" ontouchstart="k.s=1" ontouchend="k.s=0" onmousedown="k.s=1" onmouseup="k.s=0">⬇️</button>
+<button class="btn" ontouchstart="k.d=1" ontouchend="k.d=0" onmousedown="k.d=1" onmouseup="k.d=0">➡️</button>
+<button class="btn" style="background:#dc2626" ontouchstart="shoot()" onclick="shoot()">🎯 Shoot</button>
+</div>
+<script>
+const d=document,w=window,c=d.getElementById("cv"),x=c.getContext("2d");
+let p={x:600,y:450,s:10,v:3.5,dx:1,dy:0},k={},bullets=[],demons=[],won=0,score=0;
+w.onkeydown=e=>{if(e.key=="ArrowUp"||e.key=="w")k.w=1;if(e.key=="ArrowDown"||e.key=="s")k.s=1;if(e.key=="ArrowLeft"||e.key=="a")k.a=1;if(e.key=="ArrowRight"||e.key=="d")k.d=1;if(e.key==" ")shoot()};
+w.onkeyup=e=>{if(e.key=="ArrowUp"||e.key=="w")k.w=0;if(e.key=="ArrowDown"||e.key=="s")k.s=0;if(e.key=="ArrowLeft"||e.key=="a")k.a=0;if(e.key=="ArrowRight"||e.key=="d")k.d=0};
+let trees=[];for(let i=0;i<40;i++)trees.push({x:Math.random()*1160+20,y:Math.random()*860+20});
+while(demons.length<19){let dx=Math.random()*1100+50,dy=Math.random()*800+50;if(Math.hypot(dx-600,dy-450)>100)demons.push({x:dx,y:dy,vx:(Math.random()-0.5)*1.5,vy:(Math.random()-0.5)*1.5,a:1})}
+let snow=Array.from({length:40},()=>({x:Math.random()*420,y:Math.random()*260,r:Math.random()*2+1,sp:Math.random()+0.5}));
+function shoot(){bullets.push({x:p.x,y:p.y,vx:p.dx*6,vy:p.dy*6})}
+let manger={x:600,y:200,w:70,h:50};
+function loop(){
+if(!won){
+let mvx=0,mvy=0;if(k.w){mvy=-1;p.dy=-1;p.dx=0}if(k.s){mvy=1;p.dy=1;p.dx=0}if(k.a){mvx=-1;p.dx=-1;p.dy=0}if(k.d){mvx=1;p.dx=1;p.dy=0}
+p.x=Math.max(10,Math.min(1190,p.x+mvx*p.v));p.y=Math.max(10,Math.min(890,p.y+mvy*p.v));
+demons.forEach(dm=>{dm.x+=dm.vx;dm.y+=dm.vy;if(dm.x<20||dm.x>1180)dm.vx*=-1;if(dm.y<20||dm.y>880)dm.vy*=-1});
+bullets.forEach((b,bi)=>{b.x+=b.vx;b.y+=b.vy;demons.forEach(dm=>{if(dm.a&&Math.hypot(b.x-dm.x,b.y-dm.y)<15){dm.a=0;bullets.splice(bi,1);score++;
+d.getElementById("m").innerText=`Demons left: ${19-score}`;
+if(score===19)d.getElementById("m").innerText="All demons defeated! Head north to the Manger! ⭐";}})});
+if(score===19&&Math.hypot(p.x-manger.x,p.y-manger.y)<40){won=1;d.getElementById("m").innerHTML="<span style='color:#4ade80;font-weight:bold'>Happy Birthday mwuthe, I love you Shannappa, UMMAAAAA CHAKKARE 🗡️🙇‍♂️</span>";}}
+let cx=Math.max(0,Math.min(1200-c.width,p.x-c.width/2)),cy=Math.max(0,Math.min(900-c.height,p.y-c.height/2));
+x.fillStyle="#090d16";x.fillRect(0,0,c.width,c.height);x.save();x.translate(-cx,-cy);
+x.fillStyle="#0f172a";x.fillRect(0,0,1200,900);
+trees.forEach(t=>{x.fillStyle="#064e3b";x.beginPath();x.arc(t.x,t.y,16,0,7);x.fill();x.fillStyle="#fff";x.beginPath();x.arc(t.x,t.y-6,10,Math.PI,Math.PI*2);x.fill();});
+if(score===19){x.fillStyle="#78350f";x.fillRect(manger.x-35,manger.y-25,manger.w,manger.h);x.fillStyle="#f59e0b";x.beginPath();x.arc(manger.x,manger.y,10,0,7);x.fill();x.fillStyle="#38bdf8";x.fillRect(manger.x-20,manger.y-10,8,15);x.fillStyle="#ec4899";x.fillRect(manger.x+12,manger.y-10,8,15);}
+demons.forEach(dm=>{if(dm.a){x.fillStyle="#dc2626";x.beginPath();x.arc(dm.x,dm.y,10,0,7);x.fill();x.fillStyle="#fef08a";x.fillRect(dm.x-4,dm.y-4,3,3);x.fillRect(dm.x+1,dm.y-4,3,3);}});
+bullets.forEach(b=>{x.fillStyle="#facc15";x.beginPath();x.arc(b.x,b.y,4,0,7);x.fill();});
+x.fillStyle="#38bdf8";x.beginPath();x.arc(p.x,p.y,p.s,0,7);x.fill();x.strokeStyle="#fff";x.lineWidth=2;x.stroke();x.restore();
+x.fillStyle="rgba(255,255,255,0.7)";snow.forEach(s=>{s.y+=s.sp;if(s.y>c.height)s.y=0;x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fill();});
+requestAnimationFrame(loop);
+}loop();
+</script></body></html>
